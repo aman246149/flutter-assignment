@@ -24,3 +24,11 @@ class HomeErrorState extends HomeState {
   List<Object> get props => [message];
 }
 
+class HomeGetOnlineUserNamesSuccessState extends HomeState {
+  final Stream<QuerySnapshot<Map<String, dynamic>>> onlineUserNames;
+
+  const HomeGetOnlineUserNamesSuccessState(this.onlineUserNames);
+
+  @override
+  List<Object> get props => [onlineUserNames];
+}

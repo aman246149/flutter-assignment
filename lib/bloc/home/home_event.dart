@@ -10,3 +10,5 @@ abstract class HomeEvent extends Equatable {
 class SetUserStatusOnlineEvent extends HomeEvent {}
 
 class SetUserStatusOfflineEvent extends HomeEvent {}
+
+class GetOnlineUserNamesEvent extends HomeEvent {}

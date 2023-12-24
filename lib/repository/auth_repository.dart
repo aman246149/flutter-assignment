@@ -24,10 +24,11 @@ class AuthRepository {
         password: password,
       );
 
-      await _firestore
-          .collection('users')
-          .doc(userCredential.user!.uid)
-          .set({'username': username, "status": "ONLINE"});
+      await _firestore.collection('users').doc(userCredential.user!.uid).set({
+        'username': username,
+        "status": "ONLINE",
+        "userId": userCredential.user!.uid,
+      });
     } catch (e) {
       rethrow;
     }
