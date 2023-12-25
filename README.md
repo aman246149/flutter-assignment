@@ -17,3 +17,9 @@ Use Flutter and firebase to complete this assignment <br>
 
 #### How to use
 <li> Simply install and run, incase of error occured just restart the app </li>
+
+
+## Assignment Video
+
+https://github.com/aman246149/flutter-assignment/assets/53884276/4b2ead47-cced-4a4a-b6ab-a94312d9bbb6
+
