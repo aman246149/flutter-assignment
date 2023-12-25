@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:bloc/bloc.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -14,6 +15,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     on<SetUserStatusOnlineEvent>(handleSetUserStatusOnlineEvent);
     on<SetUserStatusOfflineEvent>(handleSetUserStatusOfflineEvent);
     on<GetOnlineUserNamesEvent>(handleGetOnlineUserNamesEvent);
+    on<SendImageAndStartGameEvent>(handleSendImageAndStartGameEvent);
   }
   void handleSetUserStatusOnlineEvent(
       SetUserStatusOnlineEvent event, Emitter<HomeState> emit) async {
@@ -41,6 +43,18 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       emit(HomeLoadingState());
       final onlineUserNames = HomeRepository().getOnlineUserNames();
       emit(HomeGetOnlineUserNamesSuccessState(onlineUserNames));
+    } catch (e) {
+      emit(HomeErrorState(e.toString()));
+    }
+  }
+
+  void handleSendImageAndStartGameEvent(
+      SendImageAndStartGameEvent event, Emitter<HomeState> emit) async {
+    try {
+      emit(HomeLoadingState());
+      await HomeRepository().sendImageAndStartGame(
+          event.imageFile, event.playerId);
+      emit(HomeSendImageAndStartGameSuccessState());
     } catch (e) {
       emit(HomeErrorState(e.toString()));
     }

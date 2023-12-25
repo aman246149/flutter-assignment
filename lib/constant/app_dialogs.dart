@@ -1,5 +1,9 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:ispy/constant/snackbar.dart';
 import 'package:ispy/widgets/HSpace.dart';
+import 'package:ispy/widgets/border_textfield.dart';
 import 'package:ispy/widgets/vspace.dart';
 
 import '../theme/app_color.dart';
@@ -83,6 +87,62 @@ Future showConfirmDialog(
               )
             ],
           ),
+        ),
+      );
+    },
+  );
+}
+
+Future showImageDialog(BuildContext context, File imageFile,
+     Function() sendClick) {
+  return showDialog(
+    context: context,
+    barrierDismissible: false,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            Image.file(
+              imageFile,
+              height: 200,
+              width: MediaQuery.of(context).size.width,
+              fit: BoxFit.contain,
+            ),
+            VSpace(10),
+            Text("I spy with my little eye a thing starting with the letter"),
+           
+            VSpace(10),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: PrimaryButton(
+                    text: "Cancel",
+                    onTap: () {
+                      Navigator.pop(context);
+                    },
+                    color: Color(0xffF9470E),
+                    padding: EdgeInsets.zero,
+                  ),
+                ),
+                HSpace(10),
+                Expanded(
+                  child: PrimaryButton(
+                    text: "Send",
+                    onTap: () {
+                     
+                      
+                        sendClick();
+                      
+                    },
+                    color: Color(0xffF9470E),
+                    padding: EdgeInsets.zero,
+                  ),
+                ),
+              ],
+            )
+          ],
         ),
       );
     },

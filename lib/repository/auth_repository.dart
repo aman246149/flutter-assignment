@@ -28,6 +28,7 @@ class AuthRepository {
         'username': username,
         "status": "ONLINE",
         "userId": userCredential.user!.uid,
+        "battlewith": "",
       });
     } catch (e) {
       rethrow;

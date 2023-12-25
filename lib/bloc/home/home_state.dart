@@ -32,3 +32,5 @@ class HomeGetOnlineUserNamesSuccessState extends HomeState {
   @override
   List<Object> get props => [onlineUserNames];
 }
+
+class HomeSendImageAndStartGameSuccessState extends HomeState {}
