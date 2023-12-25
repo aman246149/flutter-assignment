@@ -54,89 +54,61 @@ class HomeRepository {
 
       final String imageUrl = await (await uploadTask).ref.getDownloadURL();
 
-      await _firestore.collection('users').doc(playerId).update({
-        'imageUrl': imageUrl,
-        "battlewith": _auth.currentUser!.uid,
-        "opponent": true,
-        "chancesRemaining": 3,
+     //create a new collection called GameLobby and add data in it and store that document reference in my both players
+
+    DocumentReference doc=  await  _firestore.collection("gameLobby").add({
+
+            "imageUrl": imageUrl,
+            "position": [1.2,1.2],
+            "opponentPlayerId": playerId,
+            "myplayerId": _auth.currentUser!.uid,
+            "challengerId": _auth.currentUser!.uid,
+
       });
-      await _firestore.collection('users').doc(_auth.currentUser!.uid).update({
-        'imageUrl': imageUrl,
-        "battlewith": playerId,
-        "imageCordinates": [],
+
+      await  _firestore.collection("users").doc(_auth.currentUser!.uid).update({
+
+            "gameLobbyId": doc.id,
+            "battlewith": playerId,
+
       });
+
+      await _firestore.collection("users").doc(playerId).update({
+
+            "gameLobbyId": doc.id,
+            "battlewith": _auth.currentUser!.uid,
+
+      });
+
     } catch (e) {
       print('Failed to upload image and start game: $e');
       rethrow;
     }
   }
 
-  //create a function to update cordinates in particular document id
-  Future<void> updateCordinates(
-      List<double> cordinates, String opponentPlayerId) async {
-    try {
-      await _firestore
-          .collection('users')
-          .doc(opponentPlayerId)
-          .update({'imageCordinates': cordinates, "done": true});
-    } catch (e) {
-      print('Failed to update cordinates: $e');
-      rethrow;
-    }
+
+ Stream<DocumentSnapshot<Map<String, dynamic>>> getGameLobbyStream(String gameLobbyId) {
+  try {
+    return _firestore
+        .collection('gameLobby').doc(gameLobbyId)
+        .snapshots();
+  } catch (e) {
+    rethrow;
   }
+}
 
-  Future<void> changeColor(String opponentPlayerId) async {
-    try {
-      await _firestore
-          .collection('users')
-          .doc(opponentPlayerId)
-          .update({"done": false});
-    } catch (e) {
-      print('Failed to update cordinates: $e');
-      rethrow;
-    }
-  }
+//create a method to update the position of the player in the gameLobby collection
 
-  Future<void> updateChances(String opponentPlayerId) async {
-    try {
-      await _firestore
-          .collection('users')
-          .doc(opponentPlayerId)
-          .update({"chancesRemaining": FieldValue.increment(-1)});
-    } catch (e) {
-      print('Failed to update cordinates: $e');
-      rethrow;
-    }
-  }
+Future<void> updatePosition(List<double> position,String gameLobbyId) async {
+  try {
+    await _firestore.collection('gameLobby').doc(gameLobbyId).update({
+      'position': position,
+    });
+  } catch (e) {
+    print('Failed to update position: $e');
+    rethrow;
+  } 
+}
 
-  //create a function to reset document in
-  // 'username': username,
-  //   "status": "ONLINE",
-  //   "userId": userCredential.user!.uid,
-  //   "battlewith": "",
-  // });
-  //this state
-
-  Future<void> resetGame(String opponentPlayerId) async {
-    try {
-      await _firestore.collection('users').doc(opponentPlayerId).update({
-        "battlewith": "",
-        "done": FieldValue.delete(),
-        "imageCordinates": FieldValue.delete(),
-        "opponent": FieldValue.delete(),
-        "imageUrl": FieldValue.delete(),
-      });
-
-      await _firestore.collection('users').doc(_auth.currentUser!.uid).update({
-        "battlewith": "",
-        "done": FieldValue.delete(),
-        "imageCordinates": FieldValue.delete(),
-        "opponent": FieldValue.delete(),
-        "imageUrl": FieldValue.delete(),
-      });
-    } catch (e) {
-      print('Failed to update cordinates: $e');
-      rethrow;
-    }
-  }
+ 
 }

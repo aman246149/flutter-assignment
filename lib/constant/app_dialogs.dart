@@ -69,7 +69,7 @@ Future showConfirmDialog(
                     onTap: () {
                       cancelTap();
                     },
-                    color: Color(0xffF9470E).withOpacity(0.2),
+                    color: Color(0xffF9470E),
                     padding: EdgeInsets.zero,
                   )),
                   const HSpace(8),
@@ -93,8 +93,8 @@ Future showConfirmDialog(
   );
 }
 
-Future showImageDialog(BuildContext context, File imageFile,
-     Function() sendClick) {
+Future showImageDialog(
+    BuildContext context, File imageFile, Function() sendClick) {
   return showDialog(
     context: context,
     barrierDismissible: false,
@@ -111,7 +111,6 @@ Future showImageDialog(BuildContext context, File imageFile,
             ),
             VSpace(10),
             Text("I spy with my little eye a thing starting with the letter"),
-           
             VSpace(10),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -131,10 +130,7 @@ Future showImageDialog(BuildContext context, File imageFile,
                   child: PrimaryButton(
                     text: "Send",
                     onTap: () {
-                     
-                      
-                        sendClick();
-                      
+                      sendClick();
                     },
                     color: Color(0xffF9470E),
                     padding: EdgeInsets.zero,

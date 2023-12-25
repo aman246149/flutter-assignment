@@ -7,6 +7,7 @@ import 'package:ispy/repository/auth_repository.dart';
 import 'package:ispy/repository/home_repository.dart';
 import 'package:ispy/theme/app_color.dart';
 import 'package:ispy/ui/auth/login.dart';
+import 'package:ispy/ui/home/game_room.dart';
 import 'package:ispy/utils/imagepicker_util.dart';
 import 'package:ispy/widgets/primary_button.dart';
 import 'package:ispy/widgets/vspace.dart';
@@ -26,9 +27,6 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   String userId = FirebaseAuth.instance.currentUser!.uid;
   ImagePickerUtil imagePickerUtil = ImagePickerUtil();
   bool isImagePickerActive = false;
-
-  double localDx = 0;
-  double localDy = 0;
 
   @override
   void initState() {
@@ -107,7 +105,9 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
               });
             } else if (state is HomeSendImageAndStartGameSuccessState) {
               hideOverlayLoader(context);
-              showSuccessSnackbar(context, "Game started");
+            } else if (state is ExitGameSuccessState) {
+              hideOverlayLoader(context);
+              showSuccessSnackbar(context, "Game Exited");
             }
           },
           child: SingleChildScrollView(
@@ -156,171 +156,28 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                                   return const SizedBox.shrink();
                                 }
 
-                                if (checkIfUserNotAvailabe(snapshot, index) &&
-                                    isPlayingWithMe(snapshot, index)) {
-                                  String imageUrl =
-                                      snapshot.data?.docs[index]['imageUrl'];
-                                  List<double>? imageCordinates;
+                                //write postframecallbache here
+                                WidgetsBinding.instance
+                                    .addPostFrameCallback((timeStamp) {
+                                  if (snapshot.data!.docs[index]['battlewith']
+                                      .toString()
+                                      .isNotEmpty) {
+                                    // use Navigatorpop until root
 
-                                  if (snapshot.data?.docs[index]
-                                          .data()
-                                          .containsKey('imageCordinates') ??
-                                      false) {
-                                    print(imageCordinates);
-                                    imageCordinates = List<double>.from(snapshot
-                                        .data?.docs[index]['imageCordinates']);
+                                    Navigator.popUntil(
+                                        context, (route) => route.isFirst);
+
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) => GameRoom(
+                                                  gameLobbyIdRequired:
+                                                      snapshot.data!.docs[index]
+                                                          ['gameLobbyId'],
+                                                )));
                                   }
+                                });
 
-                                  return Column(
-                                    children: [
-                                      Container(
-                                        height: 500,
-                                        width: double.infinity,
-                                        child: Stack(
-                                          fit: StackFit.expand,
-                                          children: [
-                                            Image.network(
-                                              imageUrl,
-                                              fit: BoxFit.cover,
-                                            ),
-                                            Positioned(
-                                              left: imageCordinates?[0]
-                                                      .toDouble() ??
-                                                  localDx,
-                                              top: imageCordinates?[1]
-                                                      .toDouble() ??
-                                                  localDy,
-                                              child: UnconstrainedBox(
-                                                child: GestureDetector(
-                                                  onTap: () {},
-                                                  onPanStart: (details) {
-                                                    HomeRepository()
-                                                        .changeColor(snapshot
-                                                                .data
-                                                                ?.docs[index]
-                                                            ['battlewith']);
-                                                  },
-                                                  onPanUpdate:
-                                                      (DragUpdateDetails
-                                                          details) {
-                                                    if (snapshot
-                                                            .data?.docs[index]
-                                                            .data()
-                                                            .containsKey(
-                                                                "opponent") ==
-                                                        false) {
-                                                      return;
-                                                    }
-                                                    setState(() {
-                                                      localDx +=
-                                                          details.delta.dx;
-                                                      localDy +=
-                                                          details.delta.dy;
-                                                    });
-                                                  },
-                                                  onPanEnd: (details) {
-                                                    if (snapshot
-                                                            .data?.docs[index]
-                                                            .data()
-                                                            .containsKey(
-                                                                "opponent") ==
-                                                        false) {
-                                                      return;
-                                                    }
-                                                    HomeRepository()
-                                                        .updateCordinates(
-                                                            List<double>.from([
-                                                              localDx,
-                                                              localDy
-                                                            ]),
-                                                            snapshot.data?.docs[
-                                                                    index]
-                                                                ['battlewith']);
-                                                  },
-                                                  child: Container(
-                                                    height: 50,
-                                                    width: 50,
-                                                    decoration: BoxDecoration(
-                                                      color: Colors.transparent,
-                                                      border: Border.all(
-                                                          color: snapshot.data!
-                                                                  .docs[index]
-                                                                  .data()
-                                                                  .containsKey(
-                                                                      "done")
-                                                              ? Colors.green
-                                                              : Colors
-                                                                  .redAccent,
-                                                          width: 2),
-                                                      shape: BoxShape.circle,
-                                                    ),
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                            Positioned(
-                                              top: 5,
-                                              right: 5,
-                                              child: GestureDetector(
-                                                onTap: (){
-                                                  
-                                                },
-                                                child: Icon(
-                                                  Icons.cancel,
-                                                  color: AppColors.primary,
-                                                  size: 30,
-                                                ),
-                                              ),
-                                            )
-                                          ],
-                                        ),
-                                      ),
-                                      if (imageCordinates != null) ...[
-                                        if (snapshot.data!.docs[index]
-                                            .data()
-                                            .containsKey("done")) ...[
-                                          if (snapshot.data!.docs[index]
-                                                  .data()["done"] ==
-                                              false) ...[
-                                            VSpace(10),
-                                            Text(
-                                              "USER IS GUSSING THE IMAGE",
-                                              style: Theme.of(context)
-                                                  .textTheme
-                                                  .bodyMedium
-                                                  ?.copyWith(
-                                                      color: AppColors.primary),
-                                            ),
-                                            VSpace(10),
-                                          ] else ...[
-                                            VSpace(10),
-                                            Text("USER HAS GUESSED THE IMAGE",
-                                                style: Theme.of(context)
-                                                    .textTheme
-                                                    .bodyMedium
-                                                    ?.copyWith(
-                                                        color: Colors.purple)),
-                                            VSpace(10),
-                                          ]
-                                        ],
-                                        Row(
-                                          children: [
-                                            Expanded(
-                                                child: PrimaryButton(
-                                              text: "Wrong",
-                                              onTap: () {},
-                                            )),
-                                            Expanded(
-                                                child: PrimaryButton(
-                                              text: "Correct",
-                                              onTap: () {},
-                                            )),
-                                          ],
-                                        )
-                                      ],
-                                    ],
-                                  );
-                                }
                                 return GestureDetector(
                                   onTap: () {
                                     sendImage(snapshot, index);

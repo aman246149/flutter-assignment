@@ -23,3 +23,31 @@ class SendImageAndStartGameEvent extends HomeEvent {
       required this.playerId,
      });
 }
+
+class ExitGameEvent extends HomeEvent {
+
+  final String opponentId;
+
+  ExitGameEvent({required this.opponentId});
+
+}
+
+class GetGameLobbySteamEvent extends HomeEvent {
+
+final String gameLobbyId;
+
+  GetGameLobbySteamEvent({required this.gameLobbyId});
+
+
+}
+
+class UpdatePositionEvent extends HomeEvent {
+
+final List<double> position;
+
+final String gameLobbyId;
+
+  UpdatePositionEvent({required this.position,required this.gameLobbyId});
+
+
+}

@@ -34,3 +34,16 @@ class HomeGetOnlineUserNamesSuccessState extends HomeState {
 }
 
 class HomeSendImageAndStartGameSuccessState extends HomeState {}
+
+class ExitGameSuccessState extends HomeState {}
+
+class GetGameLobbySteamSuccessState extends HomeState {
+  final Stream<DocumentSnapshot<Map<String, dynamic>>> gameLobbyStream;
+
+  const GetGameLobbySteamSuccessState(this.gameLobbyStream);
+
+  @override
+  List<Object> get props => [gameLobbyStream];
+}
+
+class UpdatePositionSuccessState extends HomeState {}
