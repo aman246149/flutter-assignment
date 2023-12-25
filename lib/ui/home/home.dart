@@ -14,6 +14,7 @@ import 'package:ispy/widgets/vspace.dart';
 
 import '../../bloc/home/home_bloc.dart';
 import '../../constant/app_dialogs.dart';
+import '../../main.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -27,6 +28,8 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   String userId = FirebaseAuth.instance.currentUser!.uid;
   ImagePickerUtil imagePickerUtil = ImagePickerUtil();
   bool isImagePickerActive = false;
+  String gameLobbyId = "";
+  String opponentUserId = "";
 
   @override
   void initState() {
@@ -97,7 +100,15 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
               hideOverlayLoader(context);
             } else if (state is HomeErrorState) {
               hideOverlayLoader(context);
-              showErrorSnackbar(context, state.message);
+              // showErrorSnackbar(context, state.message);
+              if (state.message
+                  .contains("Some requested document was not found")) {
+                Navigator.of(context).pushReplacement(
+                  MaterialPageRoute(
+                    builder: (context) => MyApp(),
+                  ),
+                );
+              }
             } else if (state is HomeGetOnlineUserNamesSuccessState) {
               hideOverlayLoader(context);
               setState(() {
@@ -105,6 +116,14 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
               });
             } else if (state is HomeSendImageAndStartGameSuccessState) {
               hideOverlayLoader(context);
+              // Navigator.pushReplacement(
+              //     context,
+              //     MaterialPageRoute(
+              //         builder: (context) => GameRoom(
+              //               gameLobbyIdRequired: gameLobbyId,
+              //               battleWithId: userId,
+              //             )));
+              setState(() {});
             } else if (state is ExitGameSuccessState) {
               hideOverlayLoader(context);
               showSuccessSnackbar(context, "Game Exited");
@@ -164,22 +183,29 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                                       .isNotEmpty) {
                                     // use Navigatorpop until root
 
-                                    Navigator.popUntil(
-                                        context, (route) => route.isFirst);
-
-                                    Navigator.push(
+                                    Navigator.pushReplacement(
                                         context,
                                         MaterialPageRoute(
                                             builder: (context) => GameRoom(
                                                   gameLobbyIdRequired:
                                                       snapshot.data!.docs[index]
                                                           ['gameLobbyId'],
+                                                  battleWithId: snapshot.data!
+                                                      .docs[index]['userId'],
                                                 )));
                                   }
                                 });
 
                                 return GestureDetector(
                                   onTap: () {
+                                    if (snapshot.data!.docs[index]
+                                        .data()
+                                        .containsKey("gameLobbyId")) {
+                                      gameLobbyId = snapshot.data!.docs[index]
+                                          ['gameLobbyId'];
+                                    }
+                                    opponentUserId =
+                                        snapshot.data!.docs[index]['userId'];
                                     sendImage(snapshot, index);
                                   },
                                   child: ClipRRect(
@@ -259,11 +285,11 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
       imagePickerUtil.showImagePicker(context, () {
         if (imagePickerUtil.pickedImage().path.isNotEmpty) {
           showImageDialog(context, imagePickerUtil.pickedImage(), () {
-            Navigator.pop(context);
             context.read<HomeBloc>().add(SendImageAndStartGameEvent(
                   imageFile: imagePickerUtil.pickedImage(),
                   playerId: snapshot.data?.docs[index]['userId'],
                 ));
+            Navigator.pop(context);
           });
         }
         isImagePickerActive = false;

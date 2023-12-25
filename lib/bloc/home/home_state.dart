@@ -47,3 +47,7 @@ class GetGameLobbySteamSuccessState extends HomeState {
 }
 
 class UpdatePositionSuccessState extends HomeState {}
+
+class UpdatePointsSuccessState extends HomeState {}
+
+class DecreasePointsSuccessState extends HomeState {}

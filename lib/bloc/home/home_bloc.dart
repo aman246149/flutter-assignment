@@ -19,6 +19,8 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     on<ExitGameEvent>(handleExitGameEvent);
     on<GetGameLobbySteamEvent>(handleGetGameLobbySteamEvent);
     on<UpdatePositionEvent>(handleUpdatePositionEvent);
+    on<UpdatePointsEvent>(handleUpdatePointsEvent);
+    on<DecreasePointsEvent>(handleDecreasePointsEvent);
   }
   void handleSetUserStatusOnlineEvent(
       SetUserStatusOnlineEvent event, Emitter<HomeState> emit) async {
@@ -55,8 +57,8 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       SendImageAndStartGameEvent event, Emitter<HomeState> emit) async {
     try {
       emit(HomeLoadingState());
-      await HomeRepository().sendImageAndStartGame(
-          event.imageFile, event.playerId);
+      await HomeRepository()
+          .sendImageAndStartGame(event.imageFile, event.playerId);
       emit(HomeSendImageAndStartGameSuccessState());
     } catch (e) {
       emit(HomeErrorState(e.toString()));
@@ -66,35 +68,55 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   void handleExitGameEvent(ExitGameEvent event, Emitter<HomeState> emit) async {
     try {
       emit(HomeLoadingState());
-      // await HomeRepository().resetGame(event.opponentId);
+      await HomeRepository().resetGame(event.gameLobbyId, event.battleWithId);
       emit(ExitGameSuccessState());
     } catch (e) {
       emit(HomeErrorState(e.toString()));
     }
   }
 
-
   void handleGetGameLobbySteamEvent(
       GetGameLobbySteamEvent event, Emitter<HomeState> emit) async {
     try {
       emit(HomeLoadingState());
-      final gameLobbyStream = HomeRepository().getGameLobbyStream(event.gameLobbyId);
+      final gameLobbyStream =
+          HomeRepository().getGameLobbyStream(event.gameLobbyId);
       emit(GetGameLobbySteamSuccessState(gameLobbyStream));
     } catch (e) {
       emit(HomeErrorState(e.toString()));
     }
   }
 
-
   void handleUpdatePositionEvent(
       UpdatePositionEvent event, Emitter<HomeState> emit) async {
     try {
       emit(HomeLoadingState());
-      await HomeRepository().updatePosition(event.position,event.gameLobbyId);
+      await HomeRepository().updatePosition(event.position, event.gameLobbyId);
       emit(UpdatePositionSuccessState());
     } catch (e) {
       emit(HomeErrorState(e.toString()));
     }
   }
 
+  void handleUpdatePointsEvent(
+      UpdatePointsEvent event, Emitter<HomeState> emit) async {
+    try {
+      emit(HomeLoadingState());
+      await HomeRepository().updatePoints(event.gameLobbyId);
+      emit(UpdatePointsSuccessState());
+    } catch (e) {
+      emit(HomeErrorState(e.toString()));
+    }
+  }
+
+  void handleDecreasePointsEvent(
+      DecreasePointsEvent event, Emitter<HomeState> emit) async {
+    try {
+      emit(HomeLoadingState());
+      await HomeRepository().decreasePoints(event.gameLobbyId);
+      emit(DecreasePointsSuccessState());
+    } catch (e) {
+      emit(HomeErrorState(e.toString()));
+    }
+  }
 }

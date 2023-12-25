@@ -17,37 +17,42 @@ class SendImageAndStartGameEvent extends HomeEvent {
   final File imageFile;
   final String playerId;
 
-
-  SendImageAndStartGameEvent(
-      {required this.imageFile,
-      required this.playerId,
-     });
+  SendImageAndStartGameEvent({
+    required this.imageFile,
+    required this.playerId,
+  });
 }
 
 class ExitGameEvent extends HomeEvent {
+  final String gameLobbyId;
+  final String battleWithId;
 
-  final String opponentId;
-
-  ExitGameEvent({required this.opponentId});
-
+  ExitGameEvent({required this.gameLobbyId, required this.battleWithId});
 }
 
 class GetGameLobbySteamEvent extends HomeEvent {
-
-final String gameLobbyId;
+  final String gameLobbyId;
 
   GetGameLobbySteamEvent({required this.gameLobbyId});
-
-
 }
 
 class UpdatePositionEvent extends HomeEvent {
+  final List<double> position;
 
-final List<double> position;
+  final String gameLobbyId;
 
-final String gameLobbyId;
-
-  UpdatePositionEvent({required this.position,required this.gameLobbyId});
-
-
+  UpdatePositionEvent({required this.position, required this.gameLobbyId});
 }
+
+class UpdatePointsEvent extends HomeEvent {
+  final String gameLobbyId;
+
+  UpdatePointsEvent({required this.gameLobbyId});
+}
+
+class DecreasePointsEvent extends HomeEvent {
+  final String gameLobbyId;
+
+  DecreasePointsEvent({required this.gameLobbyId});
+}
+
